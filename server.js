@@ -4,26 +4,33 @@ const app = express();
 
 const PORT = 3000;
 
-async function getComments(req, res){
-  try {
-    const respuesta = await fetch('https://jsonplaceholder.typicode.com/comments');
-    
-    if (!respuesta.ok) {
-      throw new Error(`Error en la petición: ${respuesta.status}`);
-    }
-    
-    const datos = await respuesta.json();
-    res.send(datos)
+
+
+async function getSensor(req, res){
+   try {
+    const response = await fetch(
+      "https://api.openaq.org/v3/sensors/3917",
+      {
+        headers: {
+          "X-API-Key": "d88af355ad5e14a485407095843b04dbf74f2beae0714b4b9de9eb0c42d20fa8",
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    res.json(data);
   } catch (error) {
-    console.error('Hubo un error con la red o los datos:', error);
+    res.status(500).json({ error: "Error al obtener los datos" });
   }
 }
+
+app.get("/sensor", getSensor);
 
 app.get("/", (req, res) => {
   res.json({ enable: true });
 });
 
-app.get("/comments", getComments)
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
